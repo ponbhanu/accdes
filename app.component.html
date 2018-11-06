@@ -1,0 +1,291 @@
+<div class="container pad50 padding-btm100">
+    <div class="navbar navbar-default">
+        <div class="navbar-header">
+            <a class="navbar-brand" href>File Upload</a>
+        </div>
+    </div>
+    <toaster-container></toaster-container>
+    <div class="row">
+        <div class="col-md-3">
+            <h3>Select files</h3>
+            <input type="file" name="img" multiple (change)="onChange($event)">
+            <br/>
+            <div class="analytics">
+                <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Analytics</button>
+            </div>
+        </div>
+        <div class="col-md-9" >
+            <h3>Upload Status</h3>
+            <p>Files Count: {{files.length}}</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Select</th>
+                        <th width="40%" class="text-center">Name</th>
+                        <th>Size</th>
+                        <th width="20%" class="text-center">Is Primary</th>
+                        <th class="text-center">Actions</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let file of files">
+                        <td>
+                            <strong>{{file.number}}</strong>
+                        </td>
+                        <td>
+                            <input type="checkbox" value="" (change)="onClickCheckBox(file)">
+                        </td>
+                        <td>
+                            {{file.name}}
+                        </td>
+                        <td nowrap>{{ file.size/1024/1024 | number:'.2' }} MB</td>
+
+                        <td class="text-center">
+                            <label>
+                                <input type="radio" id="radio_{{file.id}}" name="is_primary" (change)="onClickRadio(file)">
+                            </label>
+                        </td>
+                        <td nowrap class="text-center">
+                            <button type="button" class="btn btn-danger btn-xs" (click)="manageActions(file.id,'delete')">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </td>
+                        <td class="text-center">
+                            <span *ngIf="file.status === 'success'">
+                                <i class="success-mark  glyphicon glyphicon-ok"></i>
+                            </span>
+                            <span *ngIf="file.status === 'fail'">
+                                <i class="fail-mark glyphicon glyphicon-ban-circle"></i>
+                            </span>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="marBot30">
+                <div>
+                    Queue progress:
+                    <div id="myProgress">
+                        <div id="bar" class="bar-grn"></div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success btn-s" (click)="uploadAllFiles()">
+                <span class="glyphicon glyphicon-upload"></span> Upload all
+            </button>
+            <button type="button" class="btn btn-warning btn-s" (click)="cancel()">
+                <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+            </button>
+            <button type="button" class="btn btn-danger btn-s" (click)="cancel()">
+                <span class="glyphicon glyphicon-trash"></span> Remove all
+            </button>
+        </div>
+    </div>
+
+    <hr>
+    <div class="container mtop30">
+        <ul class="nav nav-tabs nav-justified">
+            <li class="active">
+                <a data-toggle="tab" href="#ocr-tab" class="ocr-tab tabBgColor" (click)="addColorsToActiveTabs('ocr-tab')">O C R</a>
+            </li>
+            <li>
+                <a data-toggle="tab" href="#ml-tab" class="ml-tab" (click)="addColorsToActiveTabs('ml-tab')">M L</a>
+            </li>
+            <li>
+                <a data-toggle="tab" href="#file-tab" class="file-tab" (click)="addColorsToActiveTabs('file-tab')">Reference File</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="ocr-tab" class="mtop30 tab-pane fade in active">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div>
+                                Split status:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                OCR status:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                RFP modules:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                XLS:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                Filter:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                CSV:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="ml-tab" class="mtop30 tab-pane fade">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div>
+                                Clause ID Assignments:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                Train the module :
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                Colour Coding:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                Split:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div>
+                                XLS Generation:
+                                <div class="progress marTop10">
+                                    <div id="myProgress">
+                                        <div id="bar" class="bar-grn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="file-tab" class="mtop30 tab-pane fade">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div>
+                                <p>Reference File</p>
+                                <a title="Download" download href="/assets/files/reference.pdf" target="_self">
+                                    <button type="button" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-download-alt"></span> Download
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div>
+                                <p>Select file</p>
+                                <input type="file" name="img" (click)="uploadRefFile($event)">
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center paddTop20">
+                            <div>
+                                <button type="button" class=" disable btn btn-default btn-sm btn-primary btn-md" id="submit-btn" [disabled]="disabled"> S u b m i t
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center paddTop20">
+                            <p>Task ID:</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" (click)="closeModal()">&times;</button>
+                    <h4 class="modal-title text-align">Analytics</h4>
+                </div>
+                <div class="modal-body">
+                    <p-table [value]="analyticsData" [paginator]="true" [rows]="10">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Date
+                                    <p-calendar [(ngModel)]="toSearchDate" [showIcon]="true" (onSelect)="onSelectDate()"></p-calendar>
+                                </th>
+                                <th>Count</th>
+                            </tr>
+
+                        </ng-template>
+                        <ng-template pTemplate="body" let-count>
+                            <tr>
+                                <td>{{count.date}}</td>
+                                <td>{{count.count}}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" (click)="closeModal()">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
